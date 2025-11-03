@@ -1,4 +1,5 @@
 using NUnit.Framework.Constraints;
+using System.Collections;
 using UnityEngine;
 
 public class FIXMinerPathGen : MonoBehaviour
@@ -12,7 +13,6 @@ public class FIXMinerPathGen : MonoBehaviour
     private bool[,] grid;
 
     private int randomSelection = 0;
-    private bool hasMoved = false;
     private Vector3 minerPos;
 
     [SerializeField] private int seed;
@@ -30,39 +30,30 @@ public class FIXMinerPathGen : MonoBehaviour
         Generate();
     }
 
-    private void Update()
-    {
-       
-    }
-
     private void Generate()
     {
-        for (int i = 0; i < moves; i++)
+        for (int i = 0; i < moves; i++) //convert into while so can rerun/recheck 
         {
             randomSelection = rand.Next(0, 4);
 
             if (randomSelection == 0) // move right
             {
                 minerPos.x++;
-                hasMoved = true;
             }
             else if (randomSelection == 1) // move left
             {
                 minerPos.x--;
-                hasMoved = true;
             }
             else if (randomSelection == 2) // move up
             {
                 minerPos.z += 1;
-                hasMoved = true;
             }
             else if (randomSelection == 3) // move down
             {
                 minerPos.z -= 1;
-                hasMoved = true;
             }
 
-            // is minerpos.x < 0 or if > grid. width , dont do it and same for y
+            //if(minerPos.x < 0 || minerPos.x > size || minerPos.z < 0 || minerPos.z > size)
 
             grid[(int)minerPos.x, (int)minerPos.z] = true;
 
@@ -83,13 +74,9 @@ public class FIXMinerPathGen : MonoBehaviour
                 {
                     pathPlacer = new Vector3(miner.x, 0, miner.z);
                     GameObject.CreatePrimitive(PrimitiveType.Cube).transform.position = new Vector3(x, 0, y);
-
-
-                }
-
-           
+                }          
             }
-
+        
     }
 
 }
