@@ -1,3 +1,4 @@
+using System.Drawing;
 using UnityEngine;
 
 public static class NoiseMapGenerator
@@ -48,6 +49,23 @@ public static class NoiseMapGenerator
         }
 
         return noiseMap;
+    }
+
+    public static float[,] GemerateFallOffMap(int size, AnimationCurve ac)
+    {
+        float[,] fallOffMap = new float[size, size];
+
+        for (int i = 0;i < size;i++)
+            for (int j = 0;j < size;j++)
+            {
+                float x = i / (float)size * 2 - 1;
+                float y = j / (float)size * 2 - 1;
+
+                float value = Mathf.Max(Mathf.Abs(x), Mathf.Abs(y));
+
+                fallOffMap[i,j] = ac.Evaluate(value); //uses unity curve in inspector
+            }
+        return fallOffMap;
     }
 
 }
