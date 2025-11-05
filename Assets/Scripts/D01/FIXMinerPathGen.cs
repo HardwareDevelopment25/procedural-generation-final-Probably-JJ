@@ -53,11 +53,11 @@ public class FIXMinerPathGen : MonoBehaviour
                 minerPos.z -= 1;
             }
 
-            //if(minerPos.x < 0 || minerPos.x > size || minerPos.z < 0 || minerPos.z > size)
-
-            grid[(int)minerPos.x, (int)minerPos.z] = true;
-
             miner = minerPos;
+            //if (minerPos.x < 0 || minerPos.x > size || minerPos.z < 0 || minerPos.z > size)
+            
+            grid[(int)minerPos.x, (int)minerPos.z] = true;
+            
 
 
         }
