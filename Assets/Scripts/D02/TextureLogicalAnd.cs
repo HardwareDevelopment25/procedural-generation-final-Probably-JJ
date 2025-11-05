@@ -4,31 +4,61 @@ using UnityEngine;
 
 public class TextureLogicalAnd : MonoBehaviour
 {
+    public enum DrawMode {NoiseMap, ColourMap};
+    public DrawMode drawMode = DrawMode.NoiseMap;
+
+    [System.Serializable]
+    public struct TerrainType
+    {
+        public string name;
+        public float height;
+        public Color color;
+    }
+
+    public TerrainType[] regions;
+
     public int imageSize = 64; 
     private Texture2D texture;
     public int seed = 0;
     public float scale = 1.0f;
     System.Random random;
 
-    private Color[] pix;
+    Color[,] colourMap;
+
+    public float lacunarity = 1.0f;
+    public int octaves = 1;
+    public float persistance = 1.0f;
+    public Vector2 offset = Vector2.zero;
+    public float currentHeight;
+
+    //private Color[] pix;
 
     void Start()
     {
         texture = new Texture2D(imageSize, imageSize);
         random = new System.Random(seed);
-        pix = new Color[texture.width * texture.height];
+        //pix = new Color[texture.width * texture.height];
+        colourMap = new Color[imageSize , imageSize];
 
 
 
-        CreatePattern();
-
+        CreateMap();
         GetComponent<MeshRenderer>().material.mainTexture = texture;
     }
 
-    // Update is called once per frame
-    void CreatePattern()
+    private void Update()
     {
-        if (scale == 0) scale = 0.0000001f;
+        if(Input.GetKeyDown(KeyCode.R))
+        {
+            CreateMap();
+        }
+    }
+
+    // Update is called once per frame
+    void CreateMap()
+    {
+
+        /*    
         //go through each pixel in texture
         for(int y  = 0; y < texture.height; y++)
         {
@@ -43,7 +73,40 @@ public class TextureLogicalAnd : MonoBehaviour
                 //Color pixelColour = (random.Next(0,2) != 0 ? Color.white : Color.black);
             }
         }
-        texture.SetPixels(pix);
+        texture.SetPixels(pix); 
+        */
+
+        float[,] noiseMap = NoiseMapGenerator.GenerateNoiseMap(imageSize, imageSize, scale, lacunarity, octaves, persistance, random.Next(), offset);
+        for (int i = 0; i < noiseMap.GetLength(0); i++)
+            for (int j = 0; j < noiseMap.GetLength(1); j++) texture.SetPixel(i, j, new Color(noiseMap[i, j], noiseMap[i, j], noiseMap[i, j]));
+
         texture.Apply();
+
+
+        ColourTheMap(noiseMap);
+    }
+
+
+    public void ColourTheMap(float[,] noiseMap)
+    {
+        for(int i = 0; i < texture.width; i++)
+            for(int j = 0; j < texture.height; j++)
+            {
+                currentHeight = noiseMap[i, j];
+
+                for (int k = 0; k < regions.Length; k++)
+                {
+                    if(currentHeight <= regions[k].height)
+                    {
+                        colourMap[i,j] = regions[k].color;
+                        break;
+                    }
+                }
+            }
+
+        for (int i = 0; i < colourMap.GetLength(0); i++)
+            for (int j = 0; j < colourMap.GetLength(1); j++) texture.SetPixel(i, j, colourMap[i,j]);
+        texture.Apply();
+        drawMode = DrawMode.ColourMap;
     }
 }
