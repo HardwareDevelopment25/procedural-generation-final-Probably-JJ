@@ -51,6 +51,7 @@ public class TextureLogicalAnd : MonoBehaviour
         if(Input.GetKeyDown(KeyCode.R))
         {
             CreateMap();
+            GetComponent<MeshRenderer>().material.mainTexture = texture;
         }
     }
 
@@ -83,14 +84,14 @@ public class TextureLogicalAnd : MonoBehaviour
         texture.Apply();
 
 
-        ColourTheMap(noiseMap);
+        ColourTheMap(noiseMap, texture);
     }
 
 
-    public void ColourTheMap(float[,] noiseMap)
+    public void ColourTheMap(float[,] noiseMap, Texture2D tex)
     {
-        for(int i = 0; i < texture.width; i++)
-            for(int j = 0; j < texture.height; j++)
+        for(int i = 0; i < tex.width; i++)
+            for(int j = 0; j < tex.height; j++)
             {
                 currentHeight = noiseMap[i, j];
 
@@ -105,8 +106,8 @@ public class TextureLogicalAnd : MonoBehaviour
             }
 
         for (int i = 0; i < colourMap.GetLength(0); i++)
-            for (int j = 0; j < colourMap.GetLength(1); j++) texture.SetPixel(i, j, colourMap[i,j]);
-        texture.Apply();
+            for (int j = 0; j < colourMap.GetLength(1); j++) tex.SetPixel(i, j, colourMap[i,j]);
+        tex.Apply();
         drawMode = DrawMode.ColourMap;
     }
 }
