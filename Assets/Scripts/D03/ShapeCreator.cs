@@ -53,7 +53,7 @@ public class ShapeCreator : MonoBehaviour
         }
 
 
-        MeshData md = MeshGenerator.GenerateTerrain(combinedMap, 10.0f, ac, levelOfDetail);
+        MeshData md = MeshGenerator.GenerateTerrain(combinedMap, 5.0f, ac, levelOfDetail);
         mf.mesh = md.CreateMesh();
         
         mr.material = mat;
