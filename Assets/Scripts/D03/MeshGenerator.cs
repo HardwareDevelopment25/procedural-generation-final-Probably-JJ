@@ -2,7 +2,7 @@ using UnityEngine;
 
 public static class MeshGenerator
 {
-    public static MeshData GenerateTerrain(float[,] heightMap, float heightMult)
+    public static MeshData GenerateTerrain(float[,] heightMap, float heightMult, AnimationCurve curveModifier, int levelOfDetail)
     {
         int height = heightMap.GetLength(0);
         int width = heightMap.GetLength(1);
@@ -10,22 +10,26 @@ public static class MeshGenerator
         float topLeftX = (width - 1) / -2f;
         float topLeftZ = (height - 1) / 2f;
 
-        MeshData meshData = new MeshData(width, height);
+        int simplificationIncrement = (levelOfDetail == 0) ? 1 : levelOfDetail * 2; //if input is 0 -> set to one | other wise allow 
+        int vertsPerLine = (width - 1) / simplificationIncrement; //subtracked 1 from edge
+
+
+        MeshData meshData = new MeshData(vertsPerLine, height);
         int vertexIndex = 0;
 
-        for (int y = 0; y < height; y++)
+        for (int y = 0; y < height; y+= simplificationIncrement)
         {
-            for (int x = 0; x < width; x++)
+            for (int x = 0; x < width; x+= simplificationIncrement)
             {
-                meshData.verts[vertexIndex] = new Vector3(topLeftX + x, heightMap[x, y] * heightMult, topLeftZ - y);
+                meshData.verts[vertexIndex] = new Vector3(topLeftX + x, /*curveModifier.Evaluate*/(heightMap[x, y]) * heightMult, topLeftZ - y);
                 meshData.uvs[vertexIndex] = new Vector2(x / (float)width, y / (float)height);
 
                 if (x < width - 1 && y < height - 1)
                 {
                     //making the tris
                     //draws a square
-                    meshData.AddTri(vertexIndex, vertexIndex + width + 1, vertexIndex + width); // a = start | b = below a and right | c = below a (drawing a tri)
-                    meshData.AddTri(vertexIndex + width + 1, vertexIndex, vertexIndex + 1); //draws the other half of the square with a tri
+                    meshData.AddTri(vertexIndex, vertexIndex + vertsPerLine + 1, vertexIndex + vertsPerLine); // a = start | b = below a and right | c = below a (drawing a tri)
+                    meshData.AddTri(vertexIndex + vertsPerLine + 1, vertexIndex, vertexIndex + 1); //draws the other half of the square with a tri
                 }
                 vertexIndex++;
             }

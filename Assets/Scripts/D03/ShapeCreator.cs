@@ -9,6 +9,11 @@ public class ShapeCreator : MonoBehaviour
     private Texture2D mapTexture; 
     public float currentHeight; //for colourMap function
     Color[,] colourMap; //for colourMap function
+    public AnimationCurve ac;
+    public Material waterLevelMat;
+
+    [Range(1, 6)]
+    public int levelOfDetail = 1;
 
     [System.Serializable] //for colourMap function
     public struct TerrainType
@@ -27,21 +32,34 @@ public class ShapeCreator : MonoBehaviour
         mapTexture = new Texture2D(mapSize, mapSize);
         colourMap = new Color[mapSize, mapSize];
 
+        GameObject waterFilterPlane = GameObject.CreatePrimitive(PrimitiveType.Plane);
+        waterFilterPlane.transform.localScale = new Vector3((float)mapSize/10.0f, 1, (float)mapSize/10.0f);
+        waterFilterPlane.GetComponent<Renderer>().material = waterLevelMat;
+
         MeshFilter mf = this.AddComponent<MeshFilter>();
         MeshRenderer mr = this.AddComponent<MeshRenderer>();
 
         Material mat = new Material(Shader.Find("Unlit/Texture"));
 
         float[,] noiseMap = NoiseMapGenerator.GenerateNoiseMap(mapSize, mapSize, 20, 1, 5, 1, 0, Vector2.zero);
+        float[,] falloffmap = NoiseMapGenerator.GemerateFallOffMap(mapSize, ac);
+        float[, ] combinedMap = new float[mapSize, mapSize];
+        for (int i = 0; i < noiseMap.GetLength(0); i++)
+        {
+            for (int j = 0; j < noiseMap.GetLength(1); j++)
+            {
+                combinedMap[i, j] = noiseMap[i, j] - falloffmap[i, j];
+            }
+        }
 
 
-        MeshData md = MeshGenerator.GenerateTerrain(noiseMap, 10.0f);
+        MeshData md = MeshGenerator.GenerateTerrain(combinedMap, 10.0f, ac, levelOfDetail);
         mf.mesh = md.CreateMesh();
         
         mr.material = mat;
 
         //put texture on later
-        ColourTheMap(noiseMap, mapTexture);
+        ColourTheMap(combinedMap, mapTexture);
         mat.mainTexture = mapTexture;
     }
 
@@ -65,5 +83,7 @@ public class ShapeCreator : MonoBehaviour
         for (int i = 0; i < colourMap.GetLength(0); i++)
             for (int j = 0; j < colourMap.GetLength(1); j++) tex.SetPixel(i, j, colourMap[i, j]);
         tex.Apply();
+        tex.filterMode = FilterMode.Point;
+        tex.wrapMode = TextureWrapMode.Clamp;
     }
 }
