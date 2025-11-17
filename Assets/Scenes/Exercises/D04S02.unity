@@ -240,10 +240,32 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5b123cf87f041e74f9d77ea2e8229255, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gridSize: 256
+  gridSize: 64
   seed: 5
   percentageOfOnes: 0.48
   speed: 5
+  smoothIts: 4
+  stone: {fileID: 3338404672812438680, guid: 4670cfd891733494db4b6c454646bc70, type: 3}
+  grass: {fileID: 1341594973189146054, guid: 16297e9620c3b464a803032a9d4c9f08, type: 3}
+  spikes: {fileID: 396851464871514156, guid: 132fe2b65ea5cf9489ad764deb0ea9e8, type: 3}
+  cellPrefab: {fileID: 3457262854544675024, guid: a288c6910b0e0e94682e248eb4993308, type: 3}
+  marchinSprites:
+  - {fileID: 594586415, guid: 033ca1b6adf4bc84d982012b3cc22067, type: 3}
+  - {fileID: -544962376, guid: 033ca1b6adf4bc84d982012b3cc22067, type: 3}
+  - {fileID: -1120529750, guid: 033ca1b6adf4bc84d982012b3cc22067, type: 3}
+  - {fileID: -1038096078, guid: 033ca1b6adf4bc84d982012b3cc22067, type: 3}
+  - {fileID: -1737942540, guid: 033ca1b6adf4bc84d982012b3cc22067, type: 3}
+  - {fileID: 1668343551, guid: 033ca1b6adf4bc84d982012b3cc22067, type: 3}
+  - {fileID: -962103, guid: 033ca1b6adf4bc84d982012b3cc22067, type: 3}
+  - {fileID: -1208038078, guid: 033ca1b6adf4bc84d982012b3cc22067, type: 3}
+  - {fileID: -1857066476, guid: 033ca1b6adf4bc84d982012b3cc22067, type: 3}
+  - {fileID: -1255673541, guid: 033ca1b6adf4bc84d982012b3cc22067, type: 3}
+  - {fileID: 1162123811, guid: 033ca1b6adf4bc84d982012b3cc22067, type: 3}
+  - {fileID: 1952736344, guid: 033ca1b6adf4bc84d982012b3cc22067, type: 3}
+  - {fileID: -846790686, guid: 033ca1b6adf4bc84d982012b3cc22067, type: 3}
+  - {fileID: 1918234457, guid: 033ca1b6adf4bc84d982012b3cc22067, type: 3}
+  - {fileID: 347029637, guid: 033ca1b6adf4bc84d982012b3cc22067, type: 3}
+  - {fileID: 420195523, guid: 033ca1b6adf4bc84d982012b3cc22067, type: 3}
 --- !u!4 &457775169
 Transform:
   m_ObjectHideFlags: 0
