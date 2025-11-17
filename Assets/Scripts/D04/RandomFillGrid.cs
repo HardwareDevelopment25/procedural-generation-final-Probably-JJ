@@ -257,7 +257,7 @@ public class RandomFillGrid : MonoBehaviour
     }
 
 
-    //adding in extra diagonal lines to make smooth wrap around generated terrain
+    //generating terrain with diagonals using the same map
     //essentially all squares divided up into 4 and then checked to see which corners have connecting terrarain then filled in appropriately
 
     int GetConfigIndex(int[,] grid, int currentX, int currentY)
