@@ -80,7 +80,6 @@ public class TextureLogicalAnd : MonoBehaviour
         float[,] noiseMap = NoiseMapGenerator.GenerateNoiseMap(imageSize, imageSize, scale, lacunarity, octaves, persistance, random.Next(), offset);
         for (int i = 0; i < noiseMap.GetLength(0); i++)
             for (int j = 0; j < noiseMap.GetLength(1); j++) texture.SetPixel(i, j, new Color(noiseMap[i, j], noiseMap[i, j], noiseMap[i, j]));
-
         texture.Apply();
 
 

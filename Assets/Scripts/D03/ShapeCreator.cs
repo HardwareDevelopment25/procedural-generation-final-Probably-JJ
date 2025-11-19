@@ -41,7 +41,7 @@ public class ShapeCreator : MonoBehaviour
 
         Material mat = new Material(Shader.Find("Unlit/Texture"));
 
-        float[,] noiseMap = NoiseMapGenerator.GenerateNoiseMap(mapSize, mapSize, 20, 1, 5, 1, 0, Vector2.zero);
+        float[,] noiseMap = NoiseMapGenerator.GenerateNoiseMap(mapSize, mapSize, 20, 1, 5, 1, 67, Vector2.zero);
         float[,] falloffmap = NoiseMapGenerator.GemerateFallOffMap(mapSize, ac);
         float[, ] combinedMap = new float[mapSize, mapSize];
         for (int i = 0; i < noiseMap.GetLength(0); i++)
@@ -82,8 +82,8 @@ public class ShapeCreator : MonoBehaviour
 
         for (int i = 0; i < colourMap.GetLength(0); i++)
             for (int j = 0; j < colourMap.GetLength(1); j++) tex.SetPixel(i, j, colourMap[i, j]);
-        tex.Apply();
         tex.filterMode = FilterMode.Point;
         tex.wrapMode = TextureWrapMode.Clamp;
+        tex.Apply();
     }
 }

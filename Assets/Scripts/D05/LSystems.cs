@@ -17,7 +17,6 @@ public class LSystems : MonoBehaviour
 
     [SerializeField] private Dictionary<char, string> rules = new Dictionary<char, string>();
 
-
     private void Awake()
     {
         foreach(string law in laws)
@@ -26,6 +25,8 @@ public class LSystems : MonoBehaviour
             rules.Add(l[0][0], l[1]); //grabs what is first in a string then what ever is after
 
         }
+
+
 
         currentString = axion;
         GenerateLSystem();
