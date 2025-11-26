@@ -1,3 +1,4 @@
+using JetBrains.Annotations;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -5,6 +6,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UIElements;
 using static UnityEngine.UIElements.UxmlAttributeDescription;
 
 public class BSPDungeon : MonoBehaviour
@@ -42,6 +44,15 @@ public class BSPDungeon : MonoBehaviour
     private List<RectInt> _corridors = new List<RectInt>();
     private List<RectInt> _leafs = new List<RectInt>();
 
+
+    //walls
+    public GameObject wallPrefab;
+    public List<Edge> _edges = new List<Edge>();
+    public List<Edge> _horizontalEdges = new List<Edge>();
+    public List<Edge> _verticalEdges = new List<Edge>();
+    public List<Edge> _mergedEdges = new List<Edge>();
+
+
     private void Awake()
     {
         _rng = new System.Random();
@@ -49,7 +60,9 @@ public class BSPDungeon : MonoBehaviour
     private void Start()
     {
         Generate();
+        DetectEdge(_grid, _edges, _horizontalEdges, _verticalEdges, _mergedEdges);
     }
+    #region FloorBuilder
 
     // Generate():
     private void Generate()
@@ -65,7 +78,7 @@ public class BSPDungeon : MonoBehaviour
         SplitRecursive(_root, depth: 0);
         // 5) For each leaf: create a room
 
-        Debug.Log("Deb");
+        //Debug.Log("Deb");
         foreach (var leaf in _root.GetLeaves())
         {
             var room = CreateRoomInsideLeaf(leaf.rect);// YAY we made a room
@@ -75,6 +88,7 @@ public class BSPDungeon : MonoBehaviour
 
         }
         // 6) Connect rooms via corridors
+        ConnectTree(_root);
         // 7) Rasterize rooms + corridors into _grid
         _grid = new bool[width, height];
 
@@ -212,7 +226,7 @@ public class BSPDungeon : MonoBehaviour
 
     void SplitRecursive(Node node, int depth)
     {
-        Debug.Log("Recuresion " + depth);
+        //Debug.Log("Recuresion " + depth);
         // a) Stopping rules: if depth is high enough OR rect is too small, return
         if (depth >= maxDepth ||
         node.rect.width < 2 * minLeafSize && node.rect.height < 2 * minLeafSize) return;
@@ -298,6 +312,176 @@ public class BSPDungeon : MonoBehaviour
         // foreach (GameObject g in transform) GameObject.Destroy(g);
         GameObject.Destroy(parent);// killes em all
     }
+    #endregion
+
+    #region WallBuilder
+
+
+
+    private void DetectEdge(bool[,] grid, List<Edge> edges, List<Edge> horEdges, List<Edge> verEdges, List<Edge> mergedEdges)
+    {
+        edges.Clear();
+
+
+        if (grid == null) return;
+
+        for(int x = 0; x < grid.GetLength(0); x++)
+            for(int y = 0; y < grid.GetLength(1); y++)
+            {
+                if (!grid[x, y]) //if not floor, skip to next iteration
+                {
+                    continue;
+                }
+                else if (grid[x,y]) //if is floor, check all neigbours for either out of bounds or false (no floor)
+                {
+                    if (!grid[x, y - 1] || IsOutOfBounds(grid, x, y - 1)) //above
+                    {
+                        Edge top = new Edge();
+                        top.SetStartPoint(new Vector2Int(x, y - 1));
+                        top.SetEndPoint(new Vector2Int(x + 1, y - 1));
+                        edges.Add(top);
+                    }
+
+                    if (!grid[x, y + 1] || IsOutOfBounds(grid, x, y + 1)) //below
+                    {
+                        Edge bottom = new Edge();
+                        bottom.SetStartPoint(new Vector2Int(x, y + 1));
+                        bottom.SetEndPoint(new Vector2Int(x + 1, y + 1));
+                        edges.Add(bottom);
+                    }
+
+                    if (!grid[x - 1, y] || IsOutOfBounds(grid, x - 1, y)) //left
+                    {
+                        Edge left = new Edge();
+                        left.SetStartPoint(new Vector2Int(x - 1, y));
+                        left.SetEndPoint(new Vector2Int(x - 1, y + 1));
+                        edges.Add(left);
+                    }
+
+                    if (!grid[x + 1, y] || IsOutOfBounds(grid, x + 1, y)) //right
+                    {
+                        Edge right = new Edge();
+                        right.SetStartPoint(new Vector2Int(x + 1, y));
+                        right.SetEndPoint(new Vector2Int(x + 1, y + 1));
+                        edges.Add(right);
+                    }
+                }
+                else
+                {
+                    Debug.Log("Something really really went wrong somewhere, what did you do wrong");
+                }
+            }
+        SortEdges(edges, horEdges, verEdges);
+        MergeEdges(horEdges, verEdges, mergedEdges);
+    }
+
+    private bool IsOutOfBounds(bool[,] grid, int xPos, int yPos) //checks bounds of the grid and returns true or false
+    {
+        if (xPos > grid.GetLength(0) || xPos < 0)
+        {
+            return true;
+        }
+        else if(yPos > grid.GetLength(1) || yPos < 0)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    } 
+
+    private void SortEdges(List<Edge> edgeList, List<Edge> horEdges, List<Edge> verEdges)
+    {
+        foreach(Edge e in edgeList)
+        {
+            if(e.startPoint.x == e.endPoint.x)
+            {
+                verEdges.Add(e);
+            }
+            else if (e.startPoint.y == e.endPoint.y)
+            {
+                horEdges.Add(e);
+            }
+        }
+
+        horEdges.Sort((a, b) => { int cmp = a.startPoint.y.CompareTo(b.startPoint.y); //sorts by compairing start point y then compairing start point x
+            return (cmp != 0) ? cmp : a.startPoint.x.CompareTo(b.startPoint.x); });
+
+        verEdges.Sort((a, b) => { int cmp = a.startPoint.x.CompareTo(b.startPoint.x); //inverse to horEdges, sorts by x then y
+            return (cmp != 0) ? cmp : a.startPoint.y.CompareTo(b.startPoint.y); });
+    }
+
+    private List<Edge> MergeEdges(List<Edge> horEdges, List<Edge> verEdges, List<Edge> mergedEdges)
+    {
+        Edge[] horEdgeArry = horEdges.ToArray();
+        Edge[] verEdgeArry = verEdges.ToArray();
+        bool genericFlag = false;
+
+        //make new edge
+        Edge mergedEdge = new Edge();
+
+        for (int i = 0; i < horEdgeArry.GetLength(0) - 1; i++)
+        {
+            if (horEdgeArry[i].endPoint.y == horEdgeArry[i + 1].startPoint.y && !genericFlag)
+            {
+                //store start point
+                mergedEdge.startPoint = horEdgeArry[i].startPoint;
+
+                //lock statement so it cannot override start pos of merged Edge while unlocking the next statement
+                genericFlag = true;
+            }
+            if(horEdgeArry[i].endPoint.y != horEdgeArry[i + 1].startPoint.y && genericFlag)
+            {
+                //store final end point
+                mergedEdge.endPoint = horEdgeArry[i].endPoint;
+
+                //add to list
+                mergedEdges.Add(mergedEdge);
+
+                //locks this statement while unlocking the previous
+                genericFlag = false;
+            }
+        }
+
+        for (int i = 0; i < verEdgeArry.GetLength(0) - 1; i++)
+        {
+            if (verEdgeArry[i].endPoint.x == verEdgeArry[i + 1].startPoint.x && !genericFlag)
+            {
+                //store start point
+                mergedEdge.startPoint = verEdgeArry[i].startPoint;
+
+                //lock statement so it cannot override start pos of merged Edge while unlocking the next statement
+                genericFlag = true;
+            }
+            if(verEdgeArry[i].endPoint.x != verEdgeArry[i + 1].startPoint.x && genericFlag)
+            {
+                //store final end point
+                mergedEdge.endPoint = verEdgeArry[i].endPoint;
+
+                //add to list
+                mergedEdges.Add(mergedEdge);
+
+                //locks this statement while unlocking the previous
+                genericFlag = false;
+            }
+        }
+
+        return mergedEdges;
+    }
+
+    private void SpawnWalls(List<Edge> mergedEdges)
+    {
+        GameObject walls = new GameObject();
+        walls.name = "Walls";
+
+        foreach(Edge ME in mergedEdges)
+        {
+
+        }
+    }
+
+    #endregion
 }
 
 
@@ -337,4 +521,19 @@ class Node
         return right?.GetAnyRoom();
     }
 
+}
+
+[System.Serializable]
+public struct Edge
+{
+    public Vector2Int startPoint, endPoint;
+
+    public void SetStartPoint(Vector2Int startPos)
+    {
+        startPoint = startPos;
+    }
+    public void SetEndPoint(Vector2Int endPos)
+    {
+        endPoint = endPos;
+    }
 }
