@@ -1,33 +1,98 @@
 using JetBrains.Annotations;
 using NUnit.Framework;
+using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
+using System.Linq;
+using UnityEditor.ShaderGraph.Internal;
 using UnityEngine;
+using UnityEngine.VFX;
 
 public class RandomDistribution : MonoBehaviour
 {
-    public int totalCandidates = 5; //how many points are generated to be compaired to existing ones
-    public int totalPoints = 50; //final amount of placed objects
     public int range = 100;
+    public int amount = 3;
+    public int numberOfCandidates = 4;
 
-    List<Vector2> points = new List<Vector2>();
-    Vector3[] candidates;
+    List<Vector3> points = new List<Vector3>();
 
-    void GeneratePoints()
+    [SerializeField] GameObject mSphere;
+
+    private int randx;
+    private int randz;
+    private int currentAmount = 0;
+
+    System.Random rand;
+
+
+
+    void Start()
     {
-        
-    }
-}
+        rand = new System.Random();
 
-/*
- *  start with a point and store in array
- *  generate totalCandidates amount of candidates 
- *  store pos in array
- *  compair distances to stored distances
- *  store the one with highest distance
- * 
- *  iterate through each candidate compairing against each placed point, overriding its distance with the smallest one it comes across each time
- *  iterate though each candidate compairing against each candidate, the one with the greatest distance is the one to be stored
- * 
- * 
- */
+        Vector3 spherepos = new Vector3(rand.Next(0, range + 1), rand.Next(0, range + 1), 0);
+        Instantiate(mSphere, spherepos, Quaternion.identity);
+        points.Add(spherepos);
+
+        StartCoroutine(GeneratePoints());
+
+        //spawnSphere(range, numberOfCandidates);
+    }
+
+
+    public void spawnSphere()
+    {
+
+        randx = rand.Next(0, range + 1);
+        randz = rand.Next(0, range + 1);
+
+        GameObject Sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+
+
+        Sphere.transform.position = new Vector3(randx, 0, randz);
+
+
+    }
+
+
+
+
+
+    IEnumerator GeneratePoints()
+    {
+
+        float minDist = float.MaxValue;
+        float currentDist = 0;
+        float[] distances = new float[numberOfCandidates];
+
+        while (currentAmount < amount)
+        {
+            currentAmount++;
+            Vector3[] candidates = new Vector3[numberOfCandidates];
+
+            for (int i = 0; i < numberOfCandidates; i++)
+            {
+                candidates[i] = new Vector3((float)rand.Next(0, range + 1), (float)rand.Next(0, range + 1), 0);
+            }
+            for (int Candidate = 0; Candidate < candidates.Length; Candidate++)
+            {
+                minDist = float.MaxValue;
+                foreach (Vector3 point in points)
+                {
+                    currentDist = Mathf.Abs(Vector2.Distance(candidates[Candidate], point));
+                    if (currentDist < minDist)
+                    {
+                        minDist = currentDist;
+                    }
+                    distances[Candidate] = minDist;
+                }
+            }
+
+            int correctCandidate = distances.ToList().IndexOf(distances.Max());
+            points.Add(candidates[correctCandidate]);
+            Instantiate(mSphere, candidates[correctCandidate], Quaternion.identity, this.transform);
+            Debug.Log(currentAmount + " " + amount);
+            yield return new WaitForSeconds(0.0001f);
+        }
+    }
+
+}

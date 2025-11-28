@@ -5,7 +5,7 @@ using UnityEngine;
 public class LSystems : MonoBehaviour 
 {
 
-    public string axion = "F";
+    public string axiom = "F";
 
     private string currentString;
 
@@ -28,7 +28,7 @@ public class LSystems : MonoBehaviour
 
 
 
-        currentString = axion;
+        currentString = axiom;
         GenerateLSystem();
     }
 

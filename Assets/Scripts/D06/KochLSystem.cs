@@ -60,53 +60,51 @@ public class KochLSystem : MonoBehaviour
         Debug.Log(currentString);
     }
 
+    
     private void DrawLSystem()
     {
-        Stack<TransformInfo> _transformInfo = new Stack<TransformInfo>();
         List<Vector3> positions = new List<Vector3>();
+
+        //protective programming
+        //resets pos and rot before moving
+
+        transform.position = Vector3.zero;
+        transform.rotation = Quaternion.identity;
+
+        positions.Add(transform.position); //adding the starting position
 
         foreach(char c in currentString)
         {
             switch (c)
             {
                 case 'F':
-                case 'G':
-                    transform.Translate(Vector3.forward * length);
+                    this.gameObject.transform.Translate(Vector3.forward * length);
+                    positions.Add(transform.position); //only need to add a pos when we go to a new one
                     break;
 
                 case '+':
-                    transform.Rotate(Vector3.forward * angle);
+                    transform.Rotate(Vector3.up * angle);
                     break;
                 
                 case '-':
-                    transform.Rotate(Vector3.forward * -angle);
-                    break;
-
-                case '[':
-                    TI.SetValues(transform.position, transform.rotation);
-                    _transformInfo.Push(TI);
-                    break;
-
-                case ']':
-                    TI = _transformInfo.Pop();
-
-                    transform.position = TI.position;
-                    transform.rotation = TI.rotation;
+                    transform.Rotate(Vector3.up * -angle);
                     break;
 
                 default:
                     break;
             
             }
-            positions.Add(transform.position);
         }
 
-        transform.position = Vector3.zero; //we start at 0,0,0 so resets pos back to start point
+        //transform.position = Vector3.zero; //we start at 0,0,0 so resets pos back to start point
         lineRendererObject.GetComponent<LineRenderer>().positionCount = positions.Count;
         lineRendererObject.GetComponent<LineRenderer>().SetPositions(positions.ToArray());
+
+        //reset so it goes back to origin
+        transform.position = Vector3.zero;
+        transform.rotation = Quaternion.identity;
     }
    
-
 }
 
 
