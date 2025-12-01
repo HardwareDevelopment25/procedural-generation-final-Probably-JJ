@@ -6,12 +6,18 @@ public static class NoiseMapGenerator
     public static float[,] GenerateNoiseMap (int mapHeight, int mapWidth, float scale, float lacunarity, int octaves, float persistance, int seed, Vector2 offset)
     {
         float[,] noiseMap = new float[mapHeight, mapWidth];
-        if (scale < 0.0f) scale = 0.00001f; //ensures we dont divide by 0
+        if (scale <= 0.0f) scale = 0.00001f; //ensures we dont divide by 0
 
         float maxPossibleHeight = float.MinValue;
         float minPossibleHeight = float.MaxValue;
 
+        float halfWidth = mapWidth / 2;
+        float halfHeight = mapHeight / 2;
+
+
         System.Random rand = new System.Random(seed);
+
+
         Vector2[] octaveOffsets = new Vector2[octaves]; //try keep octaves below 5
         
         //creates x amount of samples of octave offsets for randomness
@@ -22,22 +28,26 @@ public static class NoiseMapGenerator
             octaveOffsets[i] = new Vector2(offsetX, offsetY);
         }
 
+        //=================================
+
         //create the perlin map
         for (int y = 0; y < mapHeight; y++)
         {
             for (int x = 0; x < mapWidth; x++)
             {
-                float amp = 1, frequency = 1, noiseHeight = 0;
+                float amp = 1;
+                float frequency = 1;
+                float noiseHeight = 0;
 
                 for (int i = 0; i < octaves; i++)
                 {
-                    float sampleX = (float)(x - (mapWidth / 2)) / scale * frequency + octaveOffsets[i].x;
-                    float sampleY = (float)(y - (mapHeight / 2)) / scale * frequency + octaveOffsets[i].y;
+                    float sampleX = (float)(x - halfWidth) / scale * frequency + octaveOffsets[i].x;
+                    float sampleY = (float)(y - halfHeight) / scale * frequency + octaveOffsets[i].y;
 
                     float perlinResult = Mathf.PerlinNoise(sampleX, sampleY) * 2 - 1;
                     noiseHeight += perlinResult * amp;
-                    amp += frequency;
-                    frequency += lacunarity;
+                    amp *= persistance;
+                    frequency *= lacunarity;
                 }
 
                 //we're after the highest peak and the lowest peak for lerp

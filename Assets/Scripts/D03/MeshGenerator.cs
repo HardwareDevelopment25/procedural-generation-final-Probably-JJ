@@ -2,7 +2,7 @@ using UnityEngine;
 
 public static class MeshGenerator
 {
-    public static MeshData GenerateTerrain(float[,] heightMap, float heightMult, AnimationCurve curveModifier, int levelOfDetail)
+    public static MeshData GenerateTerrain(float[,] heightMap, float heightMult, AnimationCurve animationCurve, int levelOfDetail)
     {
         int height = heightMap.GetLength(0);
         int width = heightMap.GetLength(1);
@@ -11,20 +11,21 @@ public static class MeshGenerator
         float topLeftZ = (height - 1) / 2f;
 
         int simplificationIncrement = (levelOfDetail == 0) ? 1 : levelOfDetail * 2; //if input is 0 -> set to one | other wise allow 
-        int vertsPerLine = (width - 1) / simplificationIncrement; //subtracked 1 from edge
+        int vertsPerLine = (width - 1) / simplificationIncrement + 1; //subtracked 1 from edge
 
 
-        MeshData meshData = new MeshData(vertsPerLine, height);
+        MeshData meshData = new MeshData(vertsPerLine, vertsPerLine);
         int vertexIndex = 0;
 
-        for (int y = 0; y < height; y+= simplificationIncrement)
+        for (int y = 0; y < height-1; y+= simplificationIncrement)
         {
-            for (int x = 0; x < width; x+= simplificationIncrement)
+            for (int x = 0; x < width-1; x+= simplificationIncrement)
             {
-                meshData.verts[vertexIndex] = new Vector3(topLeftX + x, /*curveModifier.Evaluate*/(heightMap[x, y]) * heightMult, topLeftZ - y);
+                meshData.verts[vertexIndex] = new Vector3(topLeftX + x, animationCurve.Evaluate(heightMap[x, y]) * heightMult, topLeftZ - y);
+
                 meshData.uvs[vertexIndex] = new Vector2(x / (float)width, y / (float)height);
 
-                if (x < width - 1 && y < height - 1)
+                if (x < width - simplificationIncrement && y < height - simplificationIncrement)
                 {
                     //making the tris
                     //draws a square
