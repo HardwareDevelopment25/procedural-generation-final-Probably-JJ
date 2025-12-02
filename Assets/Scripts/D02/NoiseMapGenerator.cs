@@ -61,7 +61,7 @@ public static class NoiseMapGenerator
         return noiseMap;
     }
 
-    public static float[,] GemerateFallOffMap(int size, AnimationCurve ac)
+    public static float[,] GenerateFallOffMap(int size, AnimationCurve ac)
     {
         float[,] fallOffMap = new float[size, size];
 

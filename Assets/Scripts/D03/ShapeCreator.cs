@@ -51,7 +51,7 @@ public class ShapeCreator : MonoBehaviour
         Material mat = new Material(Shader.Find("Unlit/Texture"));
 
         float[,] noiseMap = NoiseMapGenerator.GenerateNoiseMap(mapSize, mapSize, scale, lacunarity, octaves, persistence, seed, Vector2.zero);
-        float[,] falloffmap = NoiseMapGenerator.GemerateFallOffMap(mapSize, ac);
+        float[,] falloffmap = NoiseMapGenerator.GenerateFallOffMap(mapSize, ac);
         float[, ] combinedMap = new float[mapSize, mapSize];
         for (int i = 0; i < noiseMap.GetLength(0); i++)
         {
