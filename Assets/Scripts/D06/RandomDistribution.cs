@@ -33,7 +33,7 @@ public class RandomDistribution : MonoBehaviour
         Instantiate(mSphere, spherepos, Quaternion.identity);
         points.Add(spherepos);
 
-        StartCoroutine(GeneratePoints());
+        //StartCoroutine(GeneratePoints());
 
         //spawnSphere(range, numberOfCandidates);
     }
@@ -57,7 +57,7 @@ public class RandomDistribution : MonoBehaviour
 
 
 
-    IEnumerator GeneratePoints()
+    public void GeneratePoints()
     {
 
         float minDist = float.MaxValue;
@@ -91,7 +91,6 @@ public class RandomDistribution : MonoBehaviour
             points.Add(candidates[correctCandidate]);
             Instantiate(mSphere, candidates[correctCandidate], Quaternion.identity, this.transform);
             Debug.Log(currentAmount + " " + amount);
-            yield return new WaitForSeconds(0.0001f);
         }
     }
 

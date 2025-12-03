@@ -16,11 +16,6 @@ public class RandomPlace : MonoBehaviour
         }
     }
 
-    void Update()
-    {
-        
-    }
-
     public void SpawnSphere(int range)
     {
         int posX = range, posZ = range;

@@ -35,18 +35,13 @@ public class TerrainMesh : MonoBehaviour
 
     public TerrainType[] regions;
 
-
-    //maps
-    private float[,] noiseMap, fallOffMap, combinedMap;
-    private Color[,] colourMap;
-
     //Rendering Components
     MeshRenderer _meshRenderer;
     MeshFilter _meshFilter;
     Material _material;
     MeshCollider _collider;
 
-
+    [SerializeField] private ObjectDistribution _objectDistribution;
 
 
 
@@ -73,6 +68,8 @@ public class TerrainMesh : MonoBehaviour
 
         _meshRenderer.material = _material;
 
+        _objectDistribution = GetComponent<ObjectDistribution>();
+
         GenerateMaps();
     }
 
@@ -81,30 +78,10 @@ public class TerrainMesh : MonoBehaviour
     {
         //create maps according to input map size | Nulling them incase the size of the map is changed
 
-        if (noiseMap != null)
-        {
-            noiseMap = null;
-        }
-
-        if (fallOffMap != null)
-        {
-            fallOffMap = null;
-        }
-
-        if (combinedMap != null)
-        {
-            combinedMap = null; 
-        }
-
-        if (colourMap != null)
-        {
-            colourMap = null;
-        }
-
-        noiseMap = new float[size, size];
-        fallOffMap = new float[size, size];
-        combinedMap = new float[size, size];
-        colourMap = new Color[size, size];
+        float[,] noiseMap = new float[size, size];
+        float[,] fallOffMap = new float[size, size];
+        float[,] combinedMap = new float[size, size];
+        Color[,] colourMap = new Color[size, size];
 
         //generate maps
         noiseMap = NoiseMapGenerator.GenerateNoiseMap(size, size, scale, lacunarity, octaves, persistence, seed, Vector2.zero);
@@ -148,6 +125,15 @@ public class TerrainMesh : MonoBehaviour
         int detailOfCollider = levelOfDetail + 2;
 
         _collider.sharedMesh = MeshGenerator.GenerateTerrain(combinedMap, heightMult, _animationCurve, detailOfCollider).CreateMesh();
+
+
+
+        //Add Trees, Rocks, Shrubs and Ships
+        _objectDistribution.GenerateTrees(size, seed, 50, 4); //ambiguous numbers, change with UI integrations
+
+
+        //add more for things like rocks
+
     }
 
     private Texture2D MapToTexture(float[,] map)

@@ -1,12 +1,15 @@
 using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class ButtonEventLogic : MonoBehaviour
 {
     [SerializeField] private TerrainMesh _terrainMesh;
     public TextMeshProUGUI lodText;
     public TextMeshProUGUI mapSizeText;
+    public TextMeshProUGUI heightMultText;
+    public Slider heightMultSlider;
     private int mapCase = 3;
 
     private void Awake()
@@ -14,17 +17,20 @@ public class ButtonEventLogic : MonoBehaviour
         _terrainMesh = GameObject.FindWithTag("LogicHolder").GetComponent<TerrainMesh>();
         lodText.text = ("Smoothing Level: " + _terrainMesh.levelOfDetail);
         mapSizeText.text = ("Map Size: " + _terrainMesh.size);
+        heightMultText.text = ("Mountain Height: " + _terrainMesh.heightMult);
+
     }
     public void UpdateSeed(string input)
     {
         _terrainMesh.seed = int.Parse(input);
+
+        _terrainMesh.seed = Mathf.Abs(_terrainMesh.seed);
 
         if (_terrainMesh.seed > 999999999)
         {
             _terrainMesh.seed = 999999999;
         }
 
-        _terrainMesh.seed = Mathf.Abs(_terrainMesh.seed);
     }
 
     #region Level Of Detail
@@ -38,7 +44,6 @@ public class ButtonEventLogic : MonoBehaviour
         {
             _terrainMesh.levelOfDetail = 6;
         }
-        Debug.Log(_terrainMesh.levelOfDetail);
         lodText.text = ("Smoothing Level: " + _terrainMesh.levelOfDetail);
     }
     public void DecreaseLOD()
@@ -48,7 +53,6 @@ public class ButtonEventLogic : MonoBehaviour
         {
             _terrainMesh.levelOfDetail = 1;
         }
-        Debug.Log(_terrainMesh.levelOfDetail);
         lodText.text = ("Smoothing Level: " + _terrainMesh.levelOfDetail);
     }
 
@@ -104,5 +108,11 @@ public class ButtonEventLogic : MonoBehaviour
     }
 
     #endregion
+
+    public void UpdateHeightMult()
+    {
+        _terrainMesh.heightMult = (int)heightMultSlider.value;
+        heightMultText.text = ("Mountain Height: " + _terrainMesh.heightMult);
+    }
 
 }
