@@ -9,6 +9,12 @@ public class ButtonEventLogic : MonoBehaviour
     public TextMeshProUGUI lodText;
     public TextMeshProUGUI mapSizeText;
     public TextMeshProUGUI heightMultText;
+    public TextMeshProUGUI treeText;
+    public TextMeshProUGUI rockText;
+    public TextMeshProUGUI shipText;
+    public TextMeshProUGUI uniformityText;
+
+
     public Slider heightMultSlider;
     private int mapCase = 3;
 
@@ -18,6 +24,10 @@ public class ButtonEventLogic : MonoBehaviour
         lodText.text = ("Smoothing Level: " + _terrainMesh.levelOfDetail);
         mapSizeText.text = ("Map Size: " + _terrainMesh.size);
         heightMultText.text = ("Mountain Height: " + _terrainMesh.heightMult);
+        treeText.text = ("Tree Density: " + _terrainMesh.treeAmount / 2);
+        rockText.text = ("Rock Density: " + _terrainMesh.rockAmount / 2);
+        shipText.text = ("Ship Density: " + _terrainMesh.shipAmount / 2);
+        uniformityText.text = ("Uniformity Level: " + _terrainMesh.unitformity / 5);
 
     }
     public void UpdateSeed(string input)
@@ -73,9 +83,9 @@ public class ButtonEventLogic : MonoBehaviour
     public void DecreaseMapSize()
     {
         mapCase--;
-        if (mapCase < 0)
+        if (mapCase < 1)
         {
-            mapCase = 0;
+            mapCase = 1;
         }
         UpdateMapSize(mapCase);
     }
@@ -115,4 +125,103 @@ public class ButtonEventLogic : MonoBehaviour
         heightMultText.text = ("Mountain Height: " + _terrainMesh.heightMult);
     }
 
+    #region Trees
+
+    public void IncreaseTrees()
+    {
+        _terrainMesh.treeAmount+= 2;
+        if (_terrainMesh.treeAmount > 20)
+        {
+            _terrainMesh.treeAmount = 20;
+        }
+        treeText.text = ("Tree Density: " + _terrainMesh.treeAmount / 2);
+    }
+
+    public void DecreaseTrees()
+    {
+        _terrainMesh.treeAmount -= 2;
+        if (_terrainMesh.treeAmount < 2) 
+        {
+            _terrainMesh.treeAmount = 2;
+        }
+        treeText.text = ("Tree Density: " + _terrainMesh.treeAmount / 2);
+    }
+
+    #endregion
+
+    #region Rocks
+
+    public void IncreaseRocks()
+    {
+        _terrainMesh.rockAmount += 2;
+        if (_terrainMesh.rockAmount > 20)
+        {
+            _terrainMesh.rockAmount = 20;
+        }
+        rockText.text = ("Rock Density: " + _terrainMesh.rockAmount / 2);
+    }
+
+    public void DecreaseRocks()
+    {
+        _terrainMesh.rockAmount -= 2;
+        if (_terrainMesh.rockAmount < 2)
+        {
+            _terrainMesh.rockAmount = 2;
+        }
+        rockText.text = ("Rock Density: " + _terrainMesh.rockAmount / 2);
+    }
+
+    #endregion
+
+    #region Ships
+
+    public void IncreaseShips()
+    {
+        _terrainMesh.shipAmount += 2;
+        if (_terrainMesh.shipAmount > 20)
+        {
+            _terrainMesh.shipAmount = 20;
+        }
+        shipText.text = ("Ship Density: " + _terrainMesh.shipAmount / 2);
+    }
+
+    public void DecreaseShips()
+    {
+        _terrainMesh.shipAmount -= 2;
+        if (_terrainMesh.shipAmount < 2)
+        {
+            _terrainMesh.shipAmount = 2;
+        }
+        shipText.text = ("Ship Density: " + _terrainMesh.shipAmount / 2);
+    }
+
+    #endregion
+
+    #region Uniformity
+
+    public void IncreaseUniformity()
+    {
+        _terrainMesh.unitformity += 5;
+        if (_terrainMesh.unitformity > 25)
+        {
+            _terrainMesh.unitformity = 25;
+        }
+        uniformityText.text = ("Uniformity Level: " + _terrainMesh.unitformity/5);
+    }
+    public void DecreaseUniformity()
+    {
+        _terrainMesh.unitformity -= 5;
+        if (_terrainMesh.unitformity < 5)
+        {
+            _terrainMesh.unitformity = 5;
+        }
+        uniformityText.text = ("Uniformity Level: " + _terrainMesh.unitformity/5);
+    }
+
+    #endregion
+
+    public int GetMapCase()
+    {
+        return mapCase;
+    }
 }

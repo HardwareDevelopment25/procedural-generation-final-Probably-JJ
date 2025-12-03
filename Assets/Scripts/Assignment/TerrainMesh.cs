@@ -17,6 +17,14 @@ public class TerrainMesh : MonoBehaviour
     public int levelOfDetail = 1;
     public int heightMult = 5;
 
+    [Header("Map Details")]
+    public int treeAmount = 10;
+    public int rockAmount = 10;
+    public int shipAmount = 10;
+    public int unitformity = 5;
+
+
+
     [Header("Debug Texure View")]
     public Texture2D noiseTex; //debugging purposes
     public Texture2D fallTex;
@@ -34,6 +42,13 @@ public class TerrainMesh : MonoBehaviour
     }
 
     public TerrainType[] regions;
+    //regions made in inspector so this needs to be populated in there too
+    public float treeRegionLower;
+    public float treeRegionUpper;
+    public float rockRegionLower;
+    public float rockRegionUpper;
+    public float shipRegionLower;
+    public float shipRegionUpper;
 
     //Rendering Components
     MeshRenderer _meshRenderer;
@@ -42,7 +57,8 @@ public class TerrainMesh : MonoBehaviour
     MeshCollider _collider;
 
     [SerializeField] private ObjectDistribution _objectDistribution;
-
+    [SerializeField] private ButtonEventLogic _buttonLogic;
+    private GameObject spawnedObjects;
 
 
 
@@ -69,6 +85,7 @@ public class TerrainMesh : MonoBehaviour
         _meshRenderer.material = _material;
 
         _objectDistribution = GetComponent<ObjectDistribution>();
+        _buttonLogic = GameObject.FindGameObjectWithTag("UI").GetComponent<ButtonEventLogic>();
 
         GenerateMaps();
     }
@@ -76,8 +93,14 @@ public class TerrainMesh : MonoBehaviour
     //the use of globals justified by needing to be able to recall this function later on when changes to the parametres are made
     public void GenerateMaps()
     {
-        //create maps according to input map size | Nulling them incase the size of the map is changed
+        Destroy(spawnedObjects);
+        spawnedObjects = new GameObject();
+        spawnedObjects.name = "SpawnedObjects";
 
+
+
+
+        //create maps according to input map size
         float[,] noiseMap = new float[size, size];
         float[,] fallOffMap = new float[size, size];
         float[,] combinedMap = new float[size, size];
@@ -127,13 +150,20 @@ public class TerrainMesh : MonoBehaviour
         _collider.sharedMesh = MeshGenerator.GenerateTerrain(combinedMap, heightMult, _animationCurve, detailOfCollider).CreateMesh();
 
 
+        //each stored at a lower number that is here multiplied by map case (so there is an appropriate amount of each on their respective map sizes)
+        treeAmount *= _buttonLogic.GetMapCase();
+        rockAmount *= _buttonLogic.GetMapCase();
+        shipAmount *= _buttonLogic.GetMapCase();
 
-        //Add Trees, Rocks, Shrubs and Ships
-        _objectDistribution.GenerateTrees(size, seed, 50, 4); //ambiguous numbers, change with UI integrations
+        //Add Trees, Rocks and Ships
+        _objectDistribution.GenerateTrees(spawnedObjects, size, seed, treeAmount, unitformity, combinedMap, treeRegionUpper, treeRegionLower);
+        _objectDistribution.GenerateRocks(spawnedObjects, size, seed, rockAmount, unitformity, combinedMap, rockRegionUpper, rockRegionLower);
+        _objectDistribution.GenerateShips(spawnedObjects, size, seed, shipAmount, unitformity, combinedMap, shipRegionUpper, shipRegionLower);
 
-
-        //add more for things like rocks
-
+        //reset to their stored value
+        treeAmount /= _buttonLogic.GetMapCase();
+        rockAmount /= _buttonLogic.GetMapCase();
+        shipAmount /= _buttonLogic.GetMapCase();
     }
 
     private Texture2D MapToTexture(float[,] map)
