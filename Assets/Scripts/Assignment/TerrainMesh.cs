@@ -53,7 +53,7 @@ public class TerrainMesh : MonoBehaviour
     //Rendering Components
     MeshRenderer _meshRenderer;
     MeshFilter _meshFilter;
-    Material _material;
+    public Material _material;
     MeshCollider _collider;
 
     [SerializeField] private ObjectDistribution _objectDistribution;
@@ -79,10 +79,6 @@ public class TerrainMesh : MonoBehaviour
         {
             _collider = this.AddComponent<MeshCollider>();
         }
-        //set the shader
-        _material = new Material(Shader.Find("Unlit/Texture"));
-
-        _meshRenderer.material = _material;
 
         _objectDistribution = GetComponent<ObjectDistribution>();
         _buttonLogic = GameObject.FindGameObjectWithTag("UI").GetComponent<ButtonEventLogic>();

@@ -1,6 +1,8 @@
 using UnityEditor;
 using UnityEngine;
 
+//was causing build errors
+/*
 [CustomEditor(typeof(MazeSpawner2D3D))]
 
 public class MazeSpawner2D3DEditor : Editor
@@ -43,7 +45,7 @@ public class MazeSpawnerWindow : EditorWindow
     public int initialMazeSize = 32;
 
     //generates menu item inside unity project wide
-    [MenuItem("Tools/Generate Maze By Size")]
+    //[MenuItem("Tools/Generate Maze By Size")]
 
     public static void ShowWindow()
     {
@@ -89,3 +91,4 @@ public class MazeSpawnerWindow : EditorWindow
         }
     }
 }
+*/
